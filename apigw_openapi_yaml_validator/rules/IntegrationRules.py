@@ -1,10 +1,9 @@
 from .IValidationRules import IValidationRules
-import json
 
 class IntegrationRules(IValidationRules):
     EXTENSION_OBJECT_NAME = 'x-amazon-apigateway-integration'
 
-    def integration_properties(self):
+    def extension_properties(self) -> list:
         return [
             'cacheKeyParameters',
             'cacheNamespace',
@@ -25,23 +24,37 @@ class IntegrationRules(IValidationRules):
             'uri',
         ]
 
-    def validate(self, operation_object, method):
-        if (operation_object[self.EXTENSION_OBJECT_NAME] is None):
-            return []
+    def validate(self, openapi_yaml) -> list:
+        invalids = []
+        for path in openapi_yaml['paths']:
+            if openapi_yaml['paths'][path] is None:
+                continue
 
-        integration = operation_object[self.EXTENSION_OBJECT_NAME]
+            methods = openapi_yaml['paths'][path].keys()
 
-        for property in self.integration_properties():
-            integration.pop(property, None)
-        # print(json.dumps(integration, indent=2))
+            for method in methods:
+                if openapi_yaml['paths'][path][method] is None:
+                    continue
 
-        if integration:
-            print('==Invalid property found out')
-            # print(integration)
-            invalid_properties = []
-            for invalid_property in integration.keys():
-                invalid_properties.append(invalid_property)
-                # print(invalid_property)
-            return [self.EXTENSION_OBJECT_NAME, method, invalid_properties]
-        return []
+                operation_object = openapi_yaml['paths'][path][method]
 
+                if (operation_object[self.EXTENSION_OBJECT_NAME] is None):
+                    continue
+
+                extension_object = operation_object[self.EXTENSION_OBJECT_NAME]
+
+                for property in self.extension_properties():
+                    extension_object.pop(property, None)
+
+                if extension_object:
+                    invalid_properties = []
+                    for invalid_property in extension_object.keys():
+                        invalid_properties.append(invalid_property)
+
+                    invalids.append({
+                        'path': path,
+                        'method': method,
+                        'object_name': self.EXTENSION_OBJECT_NAME,
+                        'invalid_properties': invalid_properties
+                    })
+        return invalids

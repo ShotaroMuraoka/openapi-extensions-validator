@@ -6,7 +6,7 @@ setup(
     version="0.0.1",
     description="Amazon API Gateway extensions to OpenAPI validator.",
     author="ShotaroMuraoka",
-    packages=find_packages()
+    packages=find_packages(),
     install_requires=install_requirements,
     entry_points={
         "console_scripts": [

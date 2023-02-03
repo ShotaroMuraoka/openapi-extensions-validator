@@ -1,28 +1,9 @@
 from .IValidationRules import IValidationRules
+from ..models.XAmazonApigatewayIntegration import XAmazonApigatewayIntegration
+import re
 
 class IntegrationRules(IValidationRules):
     EXTENSION_OBJECT_NAME = 'x-amazon-apigateway-integration'
-
-    def extension_properties(self) -> list:
-        return [
-            'cacheKeyParameters',
-            'cacheNamespace',
-            'connectionId',
-            'connectionType',
-            'credentials',
-            'contentHandling',
-            'httpMethod',
-            'integrationSubtype',
-            'passthroughBehavior',
-            'payloadFormatVersion',
-            'requestParameters',
-            'requestTemplates',
-            'responses',
-            'timeoutInMillis',
-            'type',
-            'tlsConfig',
-            'uri',
-        ]
 
     def validate(self, openapi_yaml) -> list:
         invalids = []
@@ -31,7 +12,6 @@ class IntegrationRules(IValidationRules):
                 continue
 
             methods = openapi_yaml['paths'][path].keys()
-
             for method in methods:
                 if openapi_yaml['paths'][path][method] is None:
                     continue
@@ -41,20 +21,25 @@ class IntegrationRules(IValidationRules):
                 if (operation_object[self.EXTENSION_OBJECT_NAME] is None):
                     continue
 
-                extension_object = operation_object[self.EXTENSION_OBJECT_NAME]
-
-                for property in self.extension_properties():
-                    extension_object.pop(property, None)
-
-                if extension_object:
-                    invalid_properties = []
-                    for invalid_property in extension_object.keys():
-                        invalid_properties.append(invalid_property)
-
+                try:
+                    XAmazonApigatewayIntegration(**operation_object[self.EXTENSION_OBJECT_NAME])
+                except TypeError as te:
+                    # print('######type error')
                     invalids.append({
                         'path': path,
                         'method': method,
                         'object_name': self.EXTENSION_OBJECT_NAME,
-                        'invalid_properties': invalid_properties
+                        'invalid_properties': re.findall(r'\'(.*)\'', te.args[0])
+                        # TODO: return which violation. (invalid propery name or invalid value)
+                    })
+                    # TODO: invalid propertyとpath, methodをここで注入する
+                except ValueError as ve:
+                    # print('####value error')
+                    invalids.append({
+                        'path': path,
+                        'method': method,
+                        'object_name': self.EXTENSION_OBJECT_NAME,
+                        'invalid_properties': [ve.args[0]]
+                        # TODO: return which violation. (invalid propery name or invalid value)
                     })
         return invalids

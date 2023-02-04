@@ -1,8 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from .RequestParameteres import RequestParameteres
+from .RequestParameters import RequestParameters
 from .RequestTemplates import RequestTemplates
-# from .Responses import Responses
+from .Responses import Responses
 from .TlsConfig import TlsConfig
 
 @dataclass
@@ -28,11 +28,11 @@ class  XAmazonApigatewayIntegration():
     def __post_init__(self) -> None:
         # TODO: 
         if type(self.requestParameters) is dict:
-            self.requestParameters = RequestParameteres(self.requestParameters)
+            self.requestParameters = RequestParameters(self.requestParameters)
         if type(self.requestTemplates) is dict:
             self.requestTemplates = RequestTemplates(self.requestTemplates)
-        # if type(self.responses) is dict:
-        #     self.responses = Responses(**self.responses)
+        if type(self.responses) is dict:
+            self.responses = Responses(**self.responses)
         if type(self.tlsConfig) is dict:
             self.tlsConfig = TlsConfig(**self.tlsConfig)
         if type(self.cacheKeyParameters) is not list:

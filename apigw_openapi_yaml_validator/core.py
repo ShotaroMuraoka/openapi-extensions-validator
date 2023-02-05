@@ -2,7 +2,7 @@ import os, sys
 import argparse
 import yaml
 
-from .rules.IntegrationRules import IntegrationRules
+from .rules.x_amazon_apigateway_integration_rules import IntegrationRules
 
 def rule_instances() -> list:
     return [

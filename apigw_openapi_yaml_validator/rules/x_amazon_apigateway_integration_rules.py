@@ -1,8 +1,7 @@
-from .IValidationRules import IValidationRules
-from ..models.XAmazonApigatewayIntegration import XAmazonApigatewayIntegration
+from ..models.x_amazon_apigateway_integration import XAmazonApigatewayIntegration
 import re
 
-class IntegrationRules(IValidationRules):
+class IntegrationRules():
     EXTENSION_OBJECT_NAME = 'x-amazon-apigateway-integration'
 
     def validate(self, openapi_yaml) -> list:

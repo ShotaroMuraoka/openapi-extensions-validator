@@ -1,9 +1,5 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from .RequestParameters import RequestParameters
-from .RequestTemplates import RequestTemplates
-from .Responses import Responses
-from .TlsConfig import TlsConfig
 
 @dataclass
 class  XAmazonApigatewayIntegration():
@@ -46,5 +42,67 @@ class  XAmazonApigatewayIntegration():
         if self.contentHandling.upper() not in ['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']:
             raise ValueError('contentHandling', 'value', 'CONVERT_TO_BINARY|CONVERT_TO_TEXT')
 
-    def validated() -> list:
-        return []
+@dataclass
+class RequestParameters():
+    args: dict = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        self.args.pop('property', None)
+        for property in self.args.keys():
+            if property.startswith('integration.request.') == False:
+                raise ValueError(property, 'type', 'integration.request.') # TODO: starts with 'integration.request.'
+
+@dataclass
+class RequestTemplates():
+    args: dict = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        #  FIXME: to validate mime-types
+        pass
+
+@dataclass
+class Responses():
+    responses: dict = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        for response in self.responses:
+            Response(response)
+
+@dataclass
+class Response():
+    statusCode: str = '200'
+    responseTemplates: dict = field(default_factory=list) # https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/api-gateway-swagger-extensions-integration-responseTemplates.html
+    responseParameters: dict = field(default_factory=list)# https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/api-gateway-swagger-extensions-integration-responseParameters.html
+    contentHandling: str = ''
+
+    def __post_init__(self) -> None:
+        if type(self.responseTemplates) is dict:
+            self.responseTemplates = ResponseTemplates(**self.responseTemplates)
+        if type(self.responseParameters) is dict:
+            self.responseParameters = ResponseParameters(**self.responseParameters)
+
+@dataclass
+class ResponseTemplates():
+    args: dict = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        #  FIXME: to validate mime-types
+        pass
+
+@dataclass
+class ResponseParameters():
+    args: dict = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        self.args.pop('property', None)
+        for property in self.args.keys():
+            if property.startswith('method.response.header.') == False:
+                raise ValueError(property, 'type', 'method.response.header.') # TODO: starts with 'integration.request.'
+
+@dataclass
+class TlsConfig():
+    insecureSkipVerification: bool = True
+
+    def __post_init__(self) -> None:
+        if type(self.insecureSkipVerification) is not bool:
+            raise ValueError('insecureSkipVerification', 'type', 'bool')

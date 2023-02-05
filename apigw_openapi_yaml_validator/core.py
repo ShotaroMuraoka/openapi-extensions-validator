@@ -3,10 +3,12 @@ import argparse
 import yaml
 
 from .rules.x_amazon_apigateway_integration_rules import IntegrationRules
+from .rules.x_amazon_apigateway_integrations_rules import IntegrationsRules
 
 def rule_instances() -> list:
     return [
         IntegrationRules(),
+        IntegrationsRules(),
     ]
 
 def main() -> None:

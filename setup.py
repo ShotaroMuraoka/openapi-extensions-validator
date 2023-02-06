@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
-with open('requirements.txt') as requirements_file:
+
+with open("requirements.txt") as requirements_file:
     install_requirements = requirements_file.read().splitlines()
 setup(
     name="apigw-openapi-yaml-validator",
@@ -14,6 +15,6 @@ setup(
         ]
     },
     classifiers=[
-        'Programming Language :: Python :: 3.9',
-    ]
+        "Programming Language :: Python :: 3.9",
+    ],
 )

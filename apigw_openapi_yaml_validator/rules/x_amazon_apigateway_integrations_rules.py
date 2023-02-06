@@ -1,36 +1,41 @@
 from ..models.x_amazon_apigateway_integrations import XAmazonApigatewayIntegrations
 import re
 
-class IntegrationsRules():
-    EXTENSION_OBJECT_NAME = 'x-amazon-apigateway-integrations'
+
+class IntegrationsRules:
+    EXTENSION_OBJECT_NAME = "x-amazon-apigateway-integrations"
 
     def validate(self, openapi_yaml) -> list:
         invalids = []
-        if openapi_yaml.get('components', {}).get(self.EXTENSION_OBJECT_NAME) is None:
+        if openapi_yaml.get("components", {}).get(self.EXTENSION_OBJECT_NAME) is None:
             return []
         try:
-            XAmazonApigatewayIntegrations(**openapi_yaml['components'][self.EXTENSION_OBJECT_NAME])
+            XAmazonApigatewayIntegrations(
+                **openapi_yaml["components"][self.EXTENSION_OBJECT_NAME]
+            )
         except TypeError as te:
-            print('ppipip')
-            invalids.append({
-                # 'path': path,
-                # 'method': method,
-                'object_name': self.EXTENSION_OBJECT_NAME,
-                'invalid_properties': re.findall(r'\'(.*)\'', te.args[0])
-                # TODO: return which violation. (invalid propery name or invalid value)
-            })
+            invalids.append(
+                {
+                    # 'path': path,
+                    # 'method': method,
+                    "object_name": self.EXTENSION_OBJECT_NAME,
+                    "invalid_properties": re.findall(r"\'(.*)\'", te.args[0])
+                    # TODO: return which violation. (invalid propery name or invalid value)
+                }
+            )
             # TODO: invalid propertyとpath, methodをここで注入する
         except ValueError as ve:
             # print('####value error')
-            invalids.append({
-                # 'path': path,
-                # 'method': method,
-                'object_name': self.EXTENSION_OBJECT_NAME,
-                'invalid_properties': [ve.args[0]]
-                # TODO: return which violation. (invalid propery name or invalid value)
-            })
+            invalids.append(
+                {
+                    # 'path': path,
+                    # 'method': method,
+                    "object_name": self.EXTENSION_OBJECT_NAME,
+                    "invalid_properties": [ve.args[0]]
+                    # TODO: return which violation. (invalid propery name or invalid value)
+                }
+            )
         return invalids
-
 
         # for path in openapi_yaml['components']:
         #     if openapi_yaml['paths'][path] is None:
